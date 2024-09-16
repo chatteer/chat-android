@@ -1,4 +1,4 @@
-package com.chatteer.chat
+package com.chatteer.main
 
 import org.junit.Test
 
