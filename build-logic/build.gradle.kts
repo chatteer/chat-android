@@ -12,11 +12,11 @@ dependencies {
 gradlePlugin {
     plugins {
         register("androidHilt") {
-            id = "chat.android.hilt"
+            id = "chatteer.android.hilt"
             implementationClass = "com.chatteer.chat.HiltAndroidPlugin"
         }
         register("kotlinHilt") {
-            id = "chat.kotlin.hilt"
+            id = "chatteer.kotlin.hilt"
             implementationClass = "com.chatteer.chat.HiltKotlinPlugin"
         }
     }
