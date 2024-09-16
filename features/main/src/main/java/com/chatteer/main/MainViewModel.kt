@@ -10,7 +10,7 @@ import javax.inject.Inject
  * Created by juhongmin on 2024. 9. 16.
  */
 @HiltViewModel
-internal class MainViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
 
 ) : ViewModel(){
 
