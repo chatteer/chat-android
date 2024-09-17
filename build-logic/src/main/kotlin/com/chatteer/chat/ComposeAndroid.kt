@@ -20,9 +20,11 @@ internal fun Project.configureComposeAndroid() {
             add("implementation", libs.findLibrary("compose.material3").get())
             add("implementation", libs.findLibrary("compose.ui").get())
             add("implementation", libs.findLibrary("compose.ui.tooling.preview").get())
+            add("implementation", libs.findLibrary("compose.navigation").get())
             add("androidTestImplementation", libs.findLibrary("androidx.test.ext").get())
             add("androidTestImplementation", libs.findLibrary("androidx.test.espresso.core").get())
             add("androidTestImplementation", libs.findLibrary("compose.ui.test").get())
+            add("implementation", libs.findLibrary("compose.navigation.test").get())
             add("debugImplementation", libs.findLibrary("compose.ui.tooling").get())
             add("debugImplementation", libs.findLibrary("compose.ui.testManifest").get())
         }

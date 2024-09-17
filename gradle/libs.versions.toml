@@ -8,10 +8,10 @@ espressoCore = "3.6.1"
 appcompat = "1.7.0"
 hilt = "2.51.1"
 hilt-navigation = "1.2.0"
-hilt-compiler = "2.51.1"
 coroutine = "1.9.0"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
+glide-compose = "1.0.0-beta01"
 
 ## Kotlin
 # https://github.com/JetBrains/kotlin
@@ -132,6 +132,7 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 httptracking-ui = { group = "com.github.sieunju.httptracking", name = "ui", version.ref = "httptracking" }
 httptracking-interceptor = { group = "com.github.sieunju.httptracking", name = "interceptor", version.ref = "httptracking" }
 kotlinx-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glide-compose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
