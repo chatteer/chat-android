@@ -1,6 +1,7 @@
 package com.chatteer.core.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,9 +13,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,6 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import com.chatteer.core.R
+import timber.log.Timber
+import kotlin.math.roundToInt
 
 /**
  * Description : 채티어 테마 예시
@@ -40,55 +45,56 @@ import com.chatteer.core.R
 @Preview(showBackground = true, showSystemUi = true)
 private fun HeaderType1() {
     val toolbarHeight = 200.dp
-    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
-    var toolbarOffsetHeightPx by remember { mutableStateOf(0f) }
+    val toolbarMinHeight = 56.dp
+    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
+    var toolbarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
     val toolbarOffsetHeightDp = with(LocalDensity.current) { toolbarOffsetHeightPx.toDp() }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
+
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                val newOffset = toolbarOffsetHeightPx + delta
-                toolbarOffsetHeightPx = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                toolbarOffsetHeightPx += available.y
+                return Offset.Zero
+            }
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                toolbarOffsetHeightPx -= available.y
                 return Offset.Zero
             }
         }
     }
+
+    println("Scroll $toolbarOffsetHeightPx, $toolbarHeightPx")
 
     Scaffold(
         modifier = Modifier
             .nestedScroll(nestedScrollConnection)
             .fillMaxSize(),
         topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        text = "헤더 타입 1",
-                        color = ChatTheme.color.white,
-                        style = ChatTheme.text.h3M
-                    )
-                },
-                navigationIcon = {
-                    Box {
-                        Image(
-                            painter = painterResource(R.drawable.ic_arrow_left),
-                            contentDescription = "Back",
-                            modifier = Modifier.padding(15.dp)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = ChatTheme.color.primary,
-                    scrolledContainerColor = ChatTheme.color.primary
-                ),
+            Box(
                 modifier = Modifier
-                    .height(max(toolbarHeight + toolbarOffsetHeightDp, 56.dp))
-                    .offset(y = toolbarOffsetHeightDp)
-            )
+                    .fillMaxWidth()
+                    .background(ChatTheme.color.primary)
+                    .height(Math.max(-toolbarHeightPx,toolbarOffsetHeightPx).minus(toolbarHeightPx).dp)
+                    // .height(max(toolbarHeight + toolbarOffsetHeightDp, 56.dp))
+                 // .offset(y = toolbarOffsetHeightPx.dp)
+            ) {
+                Text(
+                    text = "헤더 타입 1 ${toolbarOffsetHeightDp}",
+                    color = ChatTheme.color.white,
+                    style = ChatTheme.text.h3M
+                )
+            }
         }
     ) { innerPadding ->
         LazyColumn(
             contentPadding = innerPadding,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             items(50) { index ->
                 Text(
