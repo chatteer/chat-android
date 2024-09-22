@@ -2,33 +2,36 @@ package com.chatteer.core.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -39,8 +42,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -54,7 +55,6 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.chatteer.core.R
-import kotlin.math.abs
 
 /**
  * Description : Chat UI Component
@@ -72,7 +72,8 @@ object ChatComponents {
         textStyle: TextStyle = ChatTheme.text.h4M,
         placeHolder: @Composable () -> Unit = {},
         imeAction: ImeAction = ImeAction.Next,
-        callback: (String) -> Unit
+        callback: ((String) -> Unit)? = null,
+        confirm: (String) -> Unit
     ) {
         val text = remember { mutableStateOf(initValue) }
         var isFocused by remember { mutableStateOf(false) }
@@ -119,14 +120,14 @@ object ChatComponents {
                             if (!isError.value) {
                                 isFocused = false
                                 focusManager.moveFocus(FocusDirection.Next)
-                                callback(text.value)
+                                confirm(text.value)
                             }
                         },
                         onDone = {
                             if (!isError.value) {
                                 isFocused = false
                                 focusManager.clearFocus()
-                                callback(text.value)
+                                confirm(text.value)
                             }
                         }
                     ),
@@ -162,6 +163,9 @@ object ChatComponents {
                 focusRequester.requestFocus()
             }
         }
+        LaunchedEffect(text.value) {
+            callback?.invoke(text.value)
+        }
     }
 
     @OptIn(ExperimentalGlideComposeApi::class)
@@ -185,78 +189,52 @@ object ChatComponents {
     }
 
     @Composable
+    fun VerticalSpace(height: Int) {
+        Spacer(modifier = Modifier.height(height.dp))
+    }
+
+    @Composable
+    fun HorizontalSpace(width: Int) {
+        Spacer(modifier = Modifier.width(width.dp))
+    }
+
+    @Composable
     fun HeaderAndContents(
         navigationHeader: @Composable BoxScope.() -> Unit,
         collapseHeader: (@Composable BoxScope.() -> Unit)? = null,
         stickyHeader: (@Composable BoxScope.() -> Unit)? = null,
+        scrollState: ScrollableState? = null,
         contents: @Composable BoxScope.() -> Unit
     ) {
         val density = LocalDensity.current
-        val scrollState = rememberScrollState()
         val navigationHeight = 56.dp
         val navigationHeightPx = with(density) { 56.dp.toPx() }
         var collapseHeightPx by remember { mutableStateOf(0F) }
         var stickyHeightPx by remember { mutableStateOf(0F) }
         var headerOffsetPx by remember { mutableStateOf(0F) }
-        var collapseVisiblePercentage by remember { mutableStateOf(0F) }
+        var isInnerScrollAtStart by remember { mutableStateOf(true) }
 
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                     val dy = available.y
-                    // 접히는 레이아웃 숨겨진 상태
-                    return if (dy < 0) {
-                        // 터치가 아래에서 위로 (아래로 스크롤)
-                        if (collapseHeader != null && collapseVisiblePercentage <= 0f) {
-                            println("Timber onPreScroll 접히는 레이아웃이 접혔을때 $headerOffsetPx")
-                            Offset.Zero
-                        } else {
-                            println("Timber 아래로 스크롤합니다. 보편적으로 ${headerOffsetPx}, $dy")
-                            scrollState.dispatchRawDelta(dy * -1)
-                            val offset = headerOffsetPx.plus(dy)
-                            headerOffsetPx = offset.coerceIn(-collapseHeightPx, 0F)
+                    return when {
+                        isInnerScrollAtStart && dy > 0 && headerOffsetPx < 0 -> {
+                            val newOffset = headerOffsetPx + dy
+                            headerOffsetPx = newOffset.coerceIn(-collapseHeightPx, 0f)
                             Offset(0f, dy)
                         }
-                    } else {
-                        // 터치가 위에서 아래로 (위로 스크롤)
-                        // 접히는 뷰가 접혔을때
-                        if (collapseHeader != null && collapseVisiblePercentage <= 0F) {
-                            // scrollState.dispatchRawDelta(dy)
-                            // val offset = headerOffsetPx.plus(dy)
-                            // headerOffsetPx = offset.coerceIn(-collapseHeightPx, 0F)
-                            val consumed =  scrollState.dispatchRawDelta(-dy)
-                            println("Timber 위로 스크롤, 접혔을때 ${consumed}")
-                            Offset.Zero
-                        } else {
-                            println("Timber 여기탑니다. $headerOffsetPx")
-                            val offset = headerOffsetPx.plus(dy)
-                            headerOffsetPx = offset.coerceIn(-collapseHeightPx, 0F)
+
+                        dy < 0 && headerOffsetPx > -collapseHeightPx -> {
+                            val newOffset = headerOffsetPx + dy
+                            headerOffsetPx = newOffset.coerceIn(-collapseHeightPx, 0f)
+                            Offset(0f, dy)
+                        }
+
+                        else -> {
                             Offset.Zero
                         }
                     }
-//                    return if (collapseHeader != null && collapseVisiblePercentage <= 0f) {
-//                        println("Timber onPreScroll 접히는 레이아웃이 접혔을때 $headerOffsetPx")
-//                        Offset.Zero
-//                    } else if (dy < 0) {
-//                        println("Timber onPreScroll else if dy<0 $headerOffsetPx")
-//                        // 터치가 아래에서 위로
-//                        scrollState.dispatchRawDelta(dy * -1)
-//                        val offset = headerOffsetPx.plus(dy)
-//                        // -headerMaxHeightPx ~ 0F
-//                        headerOffsetPx = offset.coerceIn(-collapseHeightPx, 0F)
-//                        Offset(0f,dy)
-//                    } else {
-//                        val offset = headerOffsetPx.plus(dy)
-//                        // -headerMaxHeightPx ~ 0F
-//                        headerOffsetPx = offset.coerceIn(-collapseHeightPx, 0F)
-//                        println("Timber onPreScroll else $headerOffsetPx")
-//                        Offset.Zero
-//                    }
-//                    val offset = headerOffsetPx.plus(dy)
-//                    // -headerMaxHeightPx ~ 0F
-//                    headerOffsetPx = offset.coerceIn(-collapseHeightPx, 0F)
-//                    println("Timber $headerOffsetPx")
-//                    return Offset.Zero
                 }
             }
         }
@@ -265,58 +243,27 @@ object ChatComponents {
                 .fillMaxSize()
                 .nestedScroll(nestedScrollConnection)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(navigationHeight)
-                    .background(ChatTheme.color.primary)
-            ) { navigationHeader() }
+            // Collapse Header
             if (collapseHeader != null) {
-//                Box(
-//                    modifier = Modifier
-//                        .padding(top = navigationHeight)
-//                        .fillMaxWidth()
-//                        .onSizeChanged { collapseHeightPx = it.height.toFloat() }
-//                        .verticalScroll(scrollState)
-//                        .onGloballyPositioned { coordinates ->
-//                            val height = coordinates.boundsInRoot().height
-//                            collapseVisiblePercentage = height / collapseHeightPx
-//                        }
-//                        .offset(y = with(density) {
-//                            headerOffsetPx.toDp()
-//                        })
-//                        .alpha(collapseVisiblePercentage)
-//                ) { collapseHeader() }
-                Column(
+                Box(
                     modifier = Modifier
-                        .padding(top = navigationHeight)
                         .fillMaxWidth()
+                        .offset(y = with(density) { (navigationHeightPx + headerOffsetPx).toDp() })
                         .onSizeChanged { collapseHeightPx = it.height.toFloat() }
-                        .verticalScroll(scrollState)
-                        .offset(y = with(density) {
-                            headerOffsetPx.toDp()
-                        })
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .onGloballyPositioned { coordinates ->
-                                val height = coordinates.boundsInRoot().height
-                                collapseVisiblePercentage = height / collapseHeightPx
-                            }
-                            .alpha(collapseVisiblePercentage)
-                    ) { collapseHeader() }
+                    collapseHeader()
                 }
             }
+
+            // Sticky Header
             if (stickyHeader != null) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = with(density) {
-                            headerOffsetPx
-                                .plus(navigationHeightPx)
+                        .offset(y = with(density) {
+                            (navigationHeightPx
                                 .plus(collapseHeightPx)
+                                .plus(headerOffsetPx))
                                 .toDp()
                         })
                         .onSizeChanged { stickyHeightPx = it.height.toFloat() }
@@ -325,21 +272,41 @@ object ChatComponents {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = with(density) {
-                        abs(
-                            headerOffsetPx
-                                .plus(navigationHeightPx)
-                                .plus(collapseHeightPx)
-                                .plus(stickyHeightPx)
-                        ).toDp()
+                    .offset(y = with(density) {
+                        (navigationHeightPx
+                            .plus(collapseHeightPx)
+                            .plus(stickyHeightPx)
+                            .plus(headerOffsetPx)).toDp()
                     })
             ) { contents() }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(navigationHeight)
+                    .background(ChatTheme.color.primary)
+            ) { navigationHeader() }
         }
 
-//        LaunchedEffect(collapseHeight) {
-//            collapseHeightPx = with(density) {
-//                this.density.toPx
-//            }
-//        }
+        if (scrollState is LazyListState) {
+            LaunchedEffect(scrollState) {
+                snapshotFlow {
+                    scrollState.firstVisibleItemIndex == 0 &&
+                            scrollState.firstVisibleItemScrollOffset == 0
+                }.collect { isInnerScrollAtStart = it }
+            }
+        } else if (scrollState is LazyGridState) {
+            LaunchedEffect(scrollState) {
+                snapshotFlow {
+                    scrollState.firstVisibleItemIndex == 0 &&
+                            scrollState.firstVisibleItemScrollOffset == 0
+                }.collect { isInnerScrollAtStart = it }
+            }
+        } else if (scrollState is ScrollState) {
+            LaunchedEffect(scrollState) {
+                snapshotFlow { scrollState.value == 0 }
+                    .collect { isInnerScrollAtStart = it }
+            }
+        }
     }
 }

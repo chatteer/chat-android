@@ -45,6 +45,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.chatteer.core.R
+import com.chatteer.core.ui.ChatComponents.HeaderAndContents
+import com.chatteer.core.ui.ChatComponents.VerticalSpace
 
 /**
  * Description : 채티어 테마 예시
@@ -197,7 +199,7 @@ private fun HeaderContents(
 private fun HeaderExample1() {
     val lazyScrollState = rememberLazyListState()
     Scaffold {
-        ChatComponents.HeaderAndContents(
+        HeaderAndContents(
             navigationHeader = {
                 Text(
                     text = "친구",
@@ -245,7 +247,8 @@ private fun HeaderExample1() {
                         style = ChatTheme.text.h
                     )
                 }
-            }
+            },
+            scrollState = lazyScrollState
         ) {
             LazyColumn(
                 state = lazyScrollState
@@ -257,6 +260,9 @@ private fun HeaderExample1() {
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
+                }
+                item {
+                    VerticalSpace(100)
                 }
             }
         }
