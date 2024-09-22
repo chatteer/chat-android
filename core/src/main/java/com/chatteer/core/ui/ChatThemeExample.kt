@@ -170,10 +170,10 @@ private fun CustomTextExample() {
             },
             imeAction = ImeAction.Done,
             callback = {
-                println("Timber 실시간 ${it}")
+                println("Timber 실시간 $it")
             }
         ) { confirmText ->
-            println("Timber 확인 버튼 ${confirmText}")
+            println("Timber 확인 버튼 $confirmText")
         }
     }
 }
