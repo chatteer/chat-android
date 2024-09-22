@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +39,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -307,6 +310,77 @@ object ChatComponents {
                 snapshotFlow { scrollState.value == 0 }
                     .collect { isInnerScrollAtStart = it }
             }
+        }
+    }
+
+    @Composable
+    fun CustomText(
+        text: String,
+        textStyle: TextStyle = ChatTheme.text.h3M,
+        textColor: Color = ChatTheme.color.black,
+        textAlignment: Alignment = Alignment.Center,
+        paddingValues: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+        modifier: Modifier = Modifier
+            .fillMaxWidth()
+            .background(ChatTheme.color.white, RoundedCornerShape(6.dp)),
+        clickCallback: () -> Unit = {}
+    ) {
+        Box(
+            modifier = modifier
+                .clickable { clickCallback() }
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .align(textAlignment),
+                style = textStyle,
+                color = textColor
+            )
+        }
+    }
+
+    @Composable
+    fun CustomText(
+        text: String,
+        isEnable: Boolean = true,
+        textAlignment: Alignment = Alignment.Center,
+        paddingValues: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+        enableTextStyle: TextStyle = ChatTheme.text.h3M,
+        enableTextColor: Color = ChatTheme.color.white,
+        enableModifier: Modifier = Modifier
+            .fillMaxWidth()
+            .background(ChatTheme.color.primary, RoundedCornerShape(6.dp)),
+        disableModifier: Modifier = Modifier
+            .fillMaxWidth()
+            .background(ChatTheme.color.gray3, RoundedCornerShape(6.dp)),
+        disableTextStyle: TextStyle = ChatTheme.text.h3M,
+        disableTextColor: Color = ChatTheme.color.white,
+        clickCallback: () -> Unit = {}
+    ) {
+        Box(
+            modifier = if (isEnable) {
+                enableModifier
+            } else {
+                disableModifier
+            }.then(Modifier.clickable { clickCallback() })
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .align(textAlignment),
+                style = if (isEnable) {
+                    enableTextStyle
+                } else {
+                    disableTextStyle
+                },
+                color = if (isEnable) {
+                    enableTextColor
+                } else {
+                    disableTextColor
+                }
+            )
         }
     }
 }
