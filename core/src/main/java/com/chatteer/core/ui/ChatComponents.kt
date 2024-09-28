@@ -459,6 +459,10 @@ object ChatComponents {
                 addAll(emptyList)
             }
         }
+        val hourList = remember { (1..12)
+            .map { String.format("%02d",it) }
+        }
+        Timber.d("HourList ${hourList}")
 
         val density = LocalDensity.current
         val itemHeight = with(density) {
