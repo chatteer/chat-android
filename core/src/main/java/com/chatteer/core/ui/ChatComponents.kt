@@ -28,12 +28,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -52,6 +55,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -212,9 +216,9 @@ object ChatComponents {
         val density = LocalDensity.current
         val navigationHeight = 56.dp
         val navigationHeightPx = with(density) { 56.dp.toPx() }
-        var collapseHeightPx by remember { mutableStateOf(0F) }
-        var stickyHeightPx by remember { mutableStateOf(0F) }
-        var headerOffsetPx by remember { mutableStateOf(0F) }
+        var collapseHeightPx by remember { mutableFloatStateOf(0F) }
+        var stickyHeightPx by remember { mutableFloatStateOf(0F) }
+        var headerOffsetPx by remember { mutableFloatStateOf(0F) }
         var isInnerScrollAtStart by remember { mutableStateOf(true) }
 
         val nestedScrollConnection = remember {
@@ -342,6 +346,7 @@ object ChatComponents {
 
     @Composable
     fun CustomText(
+        modifier: Modifier = Modifier,
         text: String,
         isEnable: Boolean = true,
         textAlignment: Alignment = Alignment.Center,
@@ -359,11 +364,12 @@ object ChatComponents {
         clickCallback: () -> Unit = {}
     ) {
         Box(
-            modifier = if (isEnable) {
-                enableModifier
-            } else {
-                disableModifier
-            }.then(Modifier.clickable { clickCallback() })
+            modifier = modifier
+                .then(
+                    if (isEnable) enableModifier
+                    else disableModifier
+                )
+                .then(Modifier.clickable { clickCallback() })
         ) {
             Text(
                 text = text,
@@ -383,4 +389,21 @@ object ChatComponents {
             )
         }
     }
+
+    fun Modifier.drawTopBorder(color: Color, strokeWidth: Dp) = composed(
+        factory = {
+            val density = LocalDensity.current
+            val strokeWidthPx = density.run { strokeWidth.toPx() }
+
+            Modifier.drawWithContent {
+                drawContent()
+                drawLine(
+                    color = color,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f),
+                    strokeWidth = strokeWidthPx
+                )
+            }
+        }
+    )
 }

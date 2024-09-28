@@ -3,6 +3,7 @@ package com.chatteer.core.ui
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -44,7 +45,6 @@ private val DarkColorScheme = darkColorScheme(
 fun ChatTheme(
     content: @Composable () -> Unit,
 ) {
-
     CompositionLocalProvider(
         LocalColor provides Color,
         LocalTypography provides Typography

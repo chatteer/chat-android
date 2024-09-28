@@ -40,6 +40,7 @@ internal fun MainScreen(
         bottomBar = {
             MainBottomBar(
                 tabs = MainTab.entries.toPersistentList(),
+                visible = navigator.shouldShowBottomBar(),
                 currentTab = navigator.currentTab,
                 onSelected = { navigator.navigate(it) },
                 onReselected = { navigator.onScrollTop(it) }
