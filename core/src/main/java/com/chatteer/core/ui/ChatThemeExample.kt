@@ -1,5 +1,6 @@
 package com.chatteer.core.ui
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ import com.chatteer.core.ui.ChatComponents.VerticalSpace
  *
  * Created by juhongmin on 2024. 9. 17.
  */
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @Preview(
     showBackground = true,
@@ -46,72 +48,74 @@ import com.chatteer.core.ui.ChatComponents.VerticalSpace
     uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 private fun HeaderExample1() {
-    val lazyScrollState = rememberLazyListState()
-    Scaffold {
-        HeaderAndContents(
-            navigationHeader = {
-                Text(
-                    text = "친구",
-                    style = ChatTheme.text.h,
-                    color = ChatTheme.color.white,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 15.dp)
-                )
-                Image(
-                    painter = painterResource(R.drawable.ic_add_chat),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 15.dp)
-                )
-            },
-            collapseHeader = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(ChatTheme.color.primary)
-                ) {
-                    ChatComponents.ImageLoader(
-                        imageUrl = "https://til.qtzz.synology.me/resources/img/20210921/1632238064795dwalkkz7dea.png",
+    ChatTheme {
+        val lazyScrollState = rememberLazyListState()
+        Scaffold {
+            HeaderAndContents(
+                navigationHeader = {
+                    Text(
+                        text = "친구",
+                        style = ChatTheme.text.h,
+                        color = ChatTheme.color.white,
                         modifier = Modifier
-                            .size(100.dp)
-                            .align(Alignment.Center)
-                            .clip(CircleShape)
-                            .border(2.dp, ChatTheme.color.white, CircleShape)
+                            .align(Alignment.CenterStart)
+                            .padding(start = 15.dp)
                     )
-                }
-            },
-            stickyHeader = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .background(ChatTheme.color.gray3),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "StickyHeader...",
-                        style = ChatTheme.text.h
+                    Image(
+                        painter = painterResource(R.drawable.ic_add_chat),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 15.dp)
                     )
-                }
-            },
-            scrollState = lazyScrollState
-        ) {
-            LazyColumn(
-                state = lazyScrollState
-            ) {
-                items(100) { index ->
-                    Text(
-                        text = "Item $index",
+                },
+                collapseHeader = {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
-                    )
-                }
-                item {
-                    VerticalSpace(100)
+                            .height(200.dp)
+                            .background(ChatTheme.color.primary)
+                    ) {
+                        ChatComponents.ImageLoader(
+                            imageUrl = "https://til.qtzz.synology.me/resources/img/20210921/1632238064795dwalkkz7dea.png",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .align(Alignment.Center)
+                                .clip(CircleShape)
+                                .border(2.dp, ChatTheme.color.white, CircleShape)
+                        )
+                    }
+                },
+                stickyHeader = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(ChatTheme.color.gray3),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "StickyHeader...",
+                            style = ChatTheme.text.h
+                        )
+                    }
+                },
+                scrollState = lazyScrollState
+            ) {
+                LazyColumn(
+                    state = lazyScrollState
+                ) {
+                    items(100) { index ->
+                        Text(
+                            text = "Item $index",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
+                    item {
+                        VerticalSpace(100)
+                    }
                 }
             }
         }
@@ -127,6 +131,7 @@ private fun HeaderExample1() {
 private fun CustomTextExample() {
     val scrollState = rememberScrollState()
     val isTextEnable = remember { mutableStateOf(true) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()

@@ -29,6 +29,7 @@ dependencies {
     implementation(libs.retrofit.json)
     implementation(libs.kotlinx.json)
     implementation(libs.glide.compose)
+    implementation(libs.androidx.appcompat)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
