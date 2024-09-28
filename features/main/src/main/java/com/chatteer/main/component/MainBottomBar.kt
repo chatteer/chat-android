@@ -27,7 +27,6 @@ import com.chatteer.core.ui.ChatComponents.drawTopBorder
 import com.chatteer.core.ui.ChatTheme
 import com.chatteer.main.MainTab
 import kotlinx.collections.immutable.PersistentList
-import timber.log.Timber
 
 @Composable
 internal fun MainBottomBar(
@@ -73,7 +72,6 @@ private fun MainBottomBarItem(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    Timber.d("MainBottomBar ${selected}, $item")
     Column(
         modifier = modifier
             .fillMaxHeight()
