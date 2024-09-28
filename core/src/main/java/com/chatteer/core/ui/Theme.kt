@@ -35,7 +35,10 @@ object ChatTheme {
 }
 
 private val LightColorScheme = lightColorScheme(
-
+    primary = Color.primary,
+    onPrimary = Color.white,
+    primaryContainer = Color.white,
+    background = Color.navigation
 )
 private val DarkColorScheme = darkColorScheme(
 
