@@ -100,7 +100,7 @@ internal fun MainNavHost(
                                     .alpha(0.5f)
                             )
                         }
-                    ) { }
+                    )
                 }
             }
             composable<MainTabRoute.Chat> {

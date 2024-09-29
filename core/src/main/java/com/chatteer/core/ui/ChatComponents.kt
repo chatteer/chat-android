@@ -433,6 +433,8 @@ object ChatComponents {
         }
     )
 
+
+
     @Composable
     fun CustomDateRollingPicker(
         fromDate: LocalDate, // start Date
@@ -445,7 +447,7 @@ object ChatComponents {
         textStyle: TextStyle = LocalTextStyle.current,
         itemPadding: PaddingValues = PaddingValues(vertical = 8.dp),
         selectBackground: @Composable BoxScope.(height: Dp) -> Unit,
-        callback: (LocalDateTime) -> Unit
+        state: DateRollingPickerState = rememberDateRollingPickerState()
     ) {
         val emptyList = List(visibleCount / 2) { "-" }
         val dayList = remember {
@@ -460,7 +462,7 @@ object ChatComponents {
             }
         }
         val hourList = remember { (1..12)
-            .map { String.format("%02d",it) }
+            .map { String.format("%02d",it,Locale.getDefault()) }
         }
         Timber.d("HourList ${hourList}")
 
