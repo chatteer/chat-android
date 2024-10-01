@@ -2,9 +2,7 @@ package com.chatteer.main.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,13 +16,12 @@ import com.chatteer.main.MainViewModel
 
 @Composable
 internal fun MainNavHost(
+    modifier: Modifier = Modifier,
     navigator: MainNavigator,
-    paddingValues: PaddingValues,
     viewModel: MainViewModel
 ) {
     Box(
-        modifier = Modifier
-            .padding(paddingValues)
+        modifier = modifier
             .fillMaxSize()
             .background(ChatTheme.color.white)
     ) {
@@ -32,7 +29,7 @@ internal fun MainNavHost(
             navController = navigator.navController,
             startDestination = MainTab.Friend.route
         ) {
-            composable<MainTabRoute.Friend>() {
+            composable<MainTabRoute.Friend> {
                 Box {
                     Text("친구")
                 }
@@ -42,7 +39,7 @@ internal fun MainNavHost(
                     Text("채팅")
                 }
             }
-            composable<MainTabRoute.More>() {
+            composable<MainTabRoute.More> {
                 Box {
                     Text("더보기")
                 }
@@ -50,3 +47,4 @@ internal fun MainNavHost(
         }
     }
 }
+
