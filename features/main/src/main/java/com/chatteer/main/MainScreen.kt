@@ -2,6 +2,7 @@ package com.chatteer.main
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,8 +33,8 @@ internal fun MainScreen(
             },
         content = {
             MainNavHost(
+                modifier = Modifier.padding(it),
                 navigator = navigator,
-                paddingValues = it,
                 viewModel = viewModel
             )
         },
