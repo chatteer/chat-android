@@ -1,5 +1,6 @@
 import com.chatteer.chat.configureCoroutineAndroid
 import com.chatteer.chat.configureHiltAndroid
+import com.chatteer.chat.libs
 
 plugins {
     id("chatteer.android.library")
@@ -19,3 +20,8 @@ android {
 
 configureHiltAndroid()
 configureCoroutineAndroid()
+
+dependencies {
+    val libs = project.extensions.libs
+    implementation(libs.findLibrary("hilt.navigation.compose").get())
+}
