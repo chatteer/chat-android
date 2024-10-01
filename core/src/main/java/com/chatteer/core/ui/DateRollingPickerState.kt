@@ -9,12 +9,17 @@ import java.time.LocalDateTime
 
 /**
  * Description : DateRollingPicker 전용 State
- * @see ChatComponents.CustomDateRollingPicker
+ * @see ChatComponents.DateRollingPicker
  *
  * Created by juhongmin on 2024. 9. 29.
  */
 class DateRollingPickerState {
-    var currentDate by mutableStateOf(LocalDateTime.now())
+
+    var currentDate: LocalDateTime by mutableStateOf(LocalDateTime.now())
+
+    fun update(newDate: LocalDateTime) {
+        currentDate = newDate
+    }
 }
 
 @Composable

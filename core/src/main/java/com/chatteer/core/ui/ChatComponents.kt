@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,7 +52,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -78,11 +78,10 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.chatteer.core.R
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import kotlinx.coroutines.flow.mapNotNull
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -433,10 +432,9 @@ object ChatComponents {
         }
     )
 
-
-
     @Composable
-    fun CustomDateRollingPicker(
+    fun DateRollingPicker(
+        modifier: Modifier = Modifier,
         fromDate: LocalDate, // start Date
         toDate: LocalDate = LocalDate.now(), // end Date
         dateFormat: DateTimeFormatter = DateTimeFormatter
@@ -449,22 +447,36 @@ object ChatComponents {
         selectBackground: @Composable BoxScope.(height: Dp) -> Unit,
         state: DateRollingPickerState = rememberDateRollingPickerState()
     ) {
-        val emptyList = List(visibleCount / 2) { "-" }
+        val emptyList = List(visibleCount / 2) { "" to LocalDate.now() }
         val dayList = remember {
-            mutableListOf<String>().apply {
+            mutableListOf<Pair<String, LocalDate>>().apply {
                 addAll(emptyList)
                 var currDate = fromDate
                 while (!currDate.isAfter(toDate)) {
-                    add(currDate.format(dateFormat))
+                    add(currDate.format(dateFormat) to currDate)
                     currDate = currDate.plusDays(1)
                 }
                 addAll(emptyList)
             }
         }
-        val hourList = remember { (1..12)
-            .map { String.format("%02d",it,Locale.getDefault()) }
+        val hourList = remember {
+            mutableListOf<String>().apply {
+                addAll(List(visibleCount / 2) { "" })
+                (0..23)
+                    .map { String.format(Locale.getDefault(), "%02d", it) }
+                    .run { addAll(this) }
+                addAll(List(visibleCount / 2) { "" })
+            }
         }
-        Timber.d("HourList ${hourList}")
+        val minuteList = remember {
+            mutableListOf<String>().apply {
+                addAll(List(visibleCount / 2) { "" })
+                (0..59)
+                    .map { String.format(Locale.getDefault(), "%02d", it) }
+                    .run { addAll(this) }
+                addAll(List(visibleCount / 2) { "" })
+            }
+        }
 
         val density = LocalDensity.current
         val itemHeight = with(density) {
@@ -474,41 +486,77 @@ object ChatComponents {
         }
         val itemHeightPx = with(density) { itemHeight.toPx() }
         val visibleMiddle = remember { visibleCount / 2 }
-        val dayScrollState = rememberLazyListState()
+
+        val findInitIndex = dayList.indexOfFirst { initDate.format(dateFormat) == it.first }.let {
+            if (it > 0) {
+                it
+            } else {
+                0
+            }
+        }
+        val dayScrollState = rememberLazyListState(
+            initialFirstVisibleItemIndex = findInitIndex
+        )
+        val dayWidth = measureTextWidth(
+            dateFormat.format(
+                LocalDateTime.now()
+                    .withMonth(12)
+                    .withDayOfMonth(30)
+            ),
+            selectedTextStyle
+        )
         val dayFlingBehavior = rememberSnapFlingBehavior(lazyListState = dayScrollState)
         val hourScrollState = rememberLazyListState()
         val hourFlingBehavior = rememberSnapFlingBehavior(lazyListState = hourScrollState)
+        val hourWidth = measureTextWidth(
+            "00",
+            selectedTextStyle
+        )
         val minuteScrollState = rememberLazyListState()
         val minuteFlingBehavior = rememberSnapFlingBehavior(lazyListState = minuteScrollState)
+        val minuteWidth = measureTextWidth(
+            "00",
+            selectedTextStyle
+        )
+        var contentWidth by remember {
+            mutableIntStateOf(-1)
+        }
 
         Box(
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier
         ) {
             selectBackground(itemHeight)
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(itemHeight * visibleCount)
+                    .onSizeChanged {
+                        contentWidth = it.width
+                    }
                     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
                     .drawWithContent {
                         drawContent()
                         drawRect(
                             brush = Brush.verticalGradient(
-                                0f to Color.Transparent,
-                                0.25f to Color.Black,
-                                0.5f to Color.Black,
-                                0.75f to Color.Black,
-                                1f to Color.Transparent
-                            ), blendMode = BlendMode.DstIn
+                                0f to Color(1.0F, 1.0F, 1.0F, 0.9f),
+                                0.1f to Color(1.0F, 1.0F, 1.0F, 0.15f),
+                                0.15f to Color(1.0F, 1.0F, 1.0F, 0.0f),
+                                0.85f to Color(1.0F, 1.0F, 1.0F, 0.0f),
+                                0.9f to Color(1.0F, 1.0F, 1.0F, 0.15f),
+                                1.0f to Color(1.0F, 1.0F, 1.0F, 0.9f)
+                            )
                         )
-                    }
+                    },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Day Rolling
                 LazyColumn(
-                    state = dayScrollState,
-                    flingBehavior = dayFlingBehavior,
                     modifier = Modifier
-                        .wrapContentSize()
-                        .fillMaxHeight()
+                        .width(dayWidth)
+                        .fillMaxHeight(),
+                    state = dayScrollState,
+                    flingBehavior = dayFlingBehavior
                 ) {
                     itemsIndexed(
                         items = dayList,
@@ -527,12 +575,63 @@ object ChatComponents {
                                 }
                             }
                             Text(
+                                text = item.first,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .fillParentMaxWidth()
+                                    .height(itemHeight)
+                                    .wrapContentHeight(align = Alignment.CenterVertically),
+                                style = textStyle.copy(
+                                    fontSize = lerp(
+                                        selectedTextStyle.fontSize,
+                                        textStyle.fontSize,
+                                        fraction
+                                    ),
+                                    color = lerp(
+                                        selectedTextStyle.color,
+                                        textStyle.color,
+                                        fraction
+                                    )
+                                ),
+                                textAlign = TextAlign.Start
+                            )
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(30.dp))
+
+                // Hour Rolling
+                LazyColumn(
+                    modifier = Modifier
+                        .width(hourWidth)
+                        .fillMaxHeight(),
+                    state = hourScrollState,
+                    flingBehavior = hourFlingBehavior
+                ) {
+                    itemsIndexed(
+                        items = hourList,
+                        key = { idx, _ -> idx },
+                        itemContent = { idx, item ->
+                            val fraction by remember {
+                                derivedStateOf {
+                                    val currentItem = hourScrollState
+                                        .layoutInfo
+                                        .visibleItemsInfo
+                                        .firstOrNull { it.key == idx } ?: return@derivedStateOf 0f
+                                    val fraction = (currentItem.offset - itemHeightPx
+                                        .times(visibleMiddle))
+                                        .div(itemHeightPx)
+                                    abs(fraction.coerceIn(-1f, 1f))
+                                }
+                            }
+                            Text(
                                 text = item,
                                 maxLines = 1,
                                 modifier = Modifier
+                                    .fillParentMaxWidth()
                                     .height(itemHeight)
-                                    .wrapContentHeight(align = Alignment.CenterVertically)
-                                    .fillParentMaxWidth(),
+                                    .wrapContentHeight(align = Alignment.CenterVertically),
                                 style = textStyle.copy(
                                     fontSize = lerp(
                                         selectedTextStyle.fontSize,
@@ -551,22 +650,101 @@ object ChatComponents {
                     )
                 }
 
-                // Hour Rolling
+                Spacer(modifier = Modifier.width(14.dp))
+                Text(
+                    text = ":",
+                    style = selectedTextStyle,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+                Spacer(modifier = Modifier.width(14.dp))
+
+                // Minute Rolling
                 LazyColumn(
-                    state = hourScrollState,
-                    flingBehavior = hourFlingBehavior
-                ) {  }
+                    modifier = Modifier
+                        .width(minuteWidth)
+                        .fillMaxHeight(),
+                    state = minuteScrollState,
+                    flingBehavior = minuteFlingBehavior
+                ) {
+                    itemsIndexed(
+                        items = minuteList,
+                        key = { idx, _ -> idx },
+                        itemContent = { idx, item ->
+                            val fraction by remember {
+                                derivedStateOf {
+                                    val currentItem = minuteScrollState
+                                        .layoutInfo
+                                        .visibleItemsInfo
+                                        .firstOrNull { it.key == idx } ?: return@derivedStateOf 0f
+                                    val fraction = (currentItem.offset - itemHeightPx
+                                        .times(visibleMiddle))
+                                        .div(itemHeightPx)
+                                    abs(fraction.coerceIn(-1f, 1f))
+                                }
+                            }
+                            Text(
+                                text = item,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .fillParentMaxWidth()
+                                    .height(itemHeight)
+                                    .wrapContentHeight(align = Alignment.CenterVertically),
+                                style = textStyle.copy(
+                                    fontSize = lerp(
+                                        selectedTextStyle.fontSize,
+                                        textStyle.fontSize,
+                                        fraction
+                                    ),
+                                    color = lerp(
+                                        selectedTextStyle.color,
+                                        textStyle.color,
+                                        fraction
+                                    )
+                                ),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    )
+                }
             }
         }
 
         LaunchedEffect(Unit) {
-            snapshotFlow { dayScrollState.firstVisibleItemIndex }
-                .map { index -> dayList[index + visibleMiddle] }
-                .distinctUntilChanged()
-                .onEach {
-                    Timber.d("Current Item $it")
-                }
-                .launchIn(this)
+            combine(
+                snapshotFlow { dayScrollState.firstVisibleItemIndex }
+                    .mapNotNull { idx -> dayList.getOrNull(idx + visibleMiddle)?.second }
+                    .distinctUntilChanged(),
+                snapshotFlow { hourScrollState.firstVisibleItemIndex }
+                    .mapNotNull { idx ->
+                        val value = hourList.getOrNull(idx + visibleMiddle)
+                        if (value.isNullOrEmpty()) {
+                            return@mapNotNull null
+                        } else {
+                            value.toIntOrNull()
+                        }
+                    }
+                    .distinctUntilChanged(),
+                snapshotFlow { minuteScrollState.firstVisibleItemIndex }
+                    .mapNotNull { idx ->
+                        val value = minuteList.getOrNull(idx + visibleMiddle)
+                        if (value.isNullOrEmpty()) {
+                            return@mapNotNull null
+                        } else {
+                            value.toIntOrNull()
+                        }
+                    },
+            ) { day, hour, minute ->
+                state.update(
+                    LocalDateTime.of(
+                        day.year,
+                        day.month,
+                        day.dayOfMonth,
+                        hour,
+                        minute
+                    )
+                )
+            }.launchIn(this)
         }
     }
 }
