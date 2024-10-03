@@ -1,6 +1,7 @@
 package com.chatteer.feature.friend.usecase
 
-import com.chatteer.feature.friend.remote.ApiService
+import com.chatteer.core.data.remote.repository.FriendRepository
+import com.chatteer.core.data.remote.repository.MemberRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -13,7 +14,8 @@ import javax.inject.Inject
  * Created by juhongmin on 2024. 10. 3.
  */
 class FriendUseCase @Inject constructor(
-    private val apiService: ApiService
+    private val memberRepository: MemberRepository,
+    private val friendRepository: FriendRepository
 ) {
     operator fun invoke() : Flow<List<String>>{
         return flow {

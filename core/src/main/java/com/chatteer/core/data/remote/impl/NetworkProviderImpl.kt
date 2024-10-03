@@ -1,9 +1,9 @@
-package com.chatteer.core.data.tcp.remote.impl
+package com.chatteer.core.data.remote.impl
 
 import android.content.Context
 import com.chatteer.core.R
-import com.chatteer.core.data.tcp.remote.CoroutineErrorHandlingCallAdapter
-import com.chatteer.core.data.tcp.remote.NetworkProvider
+import com.chatteer.core.data.remote.CoroutineErrorHandlingCallAdapter
+import com.chatteer.core.data.remote.NetworkProvider
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient

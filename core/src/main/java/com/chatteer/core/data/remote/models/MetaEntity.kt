@@ -1,4 +1,4 @@
-package com.chatteer.core.data.tcp.remote.models
+package com.chatteer.core.data.remote.models
 
 import kotlinx.serialization.Serializable
 

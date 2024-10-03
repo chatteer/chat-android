@@ -1,12 +1,8 @@
-package com.chatteer.core.data.tcp.remote
+package com.chatteer.core.data.remote
 
-import com.chatteer.core.data.tcp.remote.models.ApiResponse
-import com.chatteer.core.data.tcp.remote.models.BaseJSend
-import com.chatteer.core.data.tcp.remote.models.JSendException
-import com.chatteer.core.data.tcp.remote.models.JSendList
-import com.chatteer.core.data.tcp.remote.models.JSendListWithMeta
-import com.chatteer.core.data.tcp.remote.models.JSendObj
-import com.chatteer.core.data.tcp.remote.models.JSendObjWithMeta
+import com.chatteer.core.data.remote.models.ApiResponse
+import com.chatteer.core.data.remote.models.BaseJSend
+import com.chatteer.core.data.remote.models.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

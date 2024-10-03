@@ -1,7 +1,7 @@
 package com.chatteer.core.data.remote
 
-import com.chatteer.core.data.tcp.remote.models.ApiResponse
-import com.chatteer.core.data.tcp.remote.models.JSendException
+import com.chatteer.core.data.remote.models.ApiResponse
+import com.chatteer.core.data.remote.models.JSendException
 
 /**
  * References Kotlin Result onSuccess

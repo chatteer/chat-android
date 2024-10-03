@@ -2,10 +2,9 @@ package com.chatteer.core.data.remote
 
 import android.content.Context
 import com.chatteer.core.R
+import com.chatteer.core.data.remote.apis.FriendApiService
+import com.chatteer.core.data.remote.apis.MemberApiService
 import com.chatteer.core.data.remote.qualifier.TrackingInterceptor
-import com.chatteer.core.data.tcp.remote.CoroutineErrorHandlingCallAdapter
-import com.chatteer.core.data.tcp.remote.NetworkProvider
-import com.chatteer.core.data.tcp.remote.impl.NetworkProviderImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,9 +13,13 @@ import dagger.hilt.components.SingletonComponent
 import hmju.http.tracking_interceptor.TrackingHttpInterceptor
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.CallAdapter
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.create
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -76,11 +79,32 @@ internal object RemoteModule {
 
     @Singleton
     @Provides
-    fun provideNetworkProvider(
+    fun provideRetrofit(
         @ApplicationContext context: Context,
         json: Json,
-        httpClient: OkHttpClient
-    ): NetworkProvider {
-        return NetworkProviderImpl(context, json, httpClient)
+        client: OkHttpClient
+    ): Retrofit {
+        val builder = Retrofit.Builder()
+            .baseUrl(context.getString(R.string.BaseUrl))
+            .client(client)
+            .addCallAdapterFactory(CoroutineErrorHandlingCallAdapter.create())
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        return builder.build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideFriendApi(
+        retrofit: Retrofit
+    ): FriendApiService {
+        return retrofit.create()
+    }
+
+    @Singleton
+    @Provides
+    fun provideMemberApi(
+        retrofit: Retrofit
+    ): MemberApiService {
+        return retrofit.create()
     }
 }

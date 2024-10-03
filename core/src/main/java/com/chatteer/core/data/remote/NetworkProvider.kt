@@ -1,4 +1,4 @@
-package com.chatteer.core.data.tcp.remote
+package com.chatteer.core.data.remote
 
 /**
  * Description : 외부에서 네트워크 사용할 Provider Class

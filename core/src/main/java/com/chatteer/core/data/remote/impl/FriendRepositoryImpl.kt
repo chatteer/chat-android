@@ -2,8 +2,8 @@ package com.chatteer.core.data.remote.impl
 
 import com.chatteer.core.data.remote.apis.FriendApiService
 import com.chatteer.core.data.remote.getOrDefault
+import com.chatteer.core.data.remote.models.JSendList
 import com.chatteer.core.data.remote.repository.FriendRepository
-import com.chatteer.core.data.tcp.remote.models.JSendList
 import com.chatteer.core.model.FriendModel
 import javax.inject.Inject
 

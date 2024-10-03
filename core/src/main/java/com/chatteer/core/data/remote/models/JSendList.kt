@@ -1,5 +1,6 @@
-package com.chatteer.core.data.tcp.remote.models
+package com.chatteer.core.data.remote.models
 
+import com.chatteer.core.data.remote.models.BaseJSend
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
