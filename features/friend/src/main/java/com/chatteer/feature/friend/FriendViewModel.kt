@@ -14,4 +14,5 @@ import javax.inject.Inject
 class FriendViewModel @Inject constructor(
     private val useCase : FriendUseCase
 ) : ViewModel() {
+
 }

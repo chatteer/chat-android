@@ -1,9 +1,15 @@
 package com.chatteer.feature.friend.navigation
 
-/**
- * Description :
- *
- * Created by juhongmin on 2024. 10. 3.
- */
-class FriendNavigation {
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import com.chatteer.core.navigation.MainTabRoute
+import com.chatteer.feature.friend.FriendScreen
+
+
+fun NavGraphBuilder.friendNavGraph(
+
+) {
+    composable<MainTabRoute.Friend>() {
+        FriendScreen(it,)
+    }
 }

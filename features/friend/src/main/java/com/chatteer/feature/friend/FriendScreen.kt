@@ -24,7 +24,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @Composable
 fun FriendScreen(
     navBackStackEntry: NavBackStackEntry,
-    navController: NavController,
     viewModel: FriendViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
