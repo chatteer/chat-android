@@ -20,3 +20,5 @@ rootProject.name = "chat-android"
 include(":app")
 include(":core")
 include(":features:main")
+include(":features:friend")
+include(":model")

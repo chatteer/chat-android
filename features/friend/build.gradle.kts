@@ -2,18 +2,20 @@ import com.chatteer.chat.setNamespace
 
 plugins {
     id("chatteer.android.feature")
+    id("kotlinx-serialization")
 }
 
 android {
-    setNamespace("features.main")
+    setNamespace("features.friend")
 }
 
 dependencies {
     implementation(projects.core)
-    // implementation(projects.features.friend)
+    implementation(projects.model)
+    implementation(libs.retrofit)
+    implementation(libs.kotlinx.json)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.kotlinx.immutable)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
