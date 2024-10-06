@@ -1,6 +1,6 @@
 package com.chatteer.core.data.remote.repository
 
-import com.chatteer.core.model.MemberModel
+import com.chatteer.core.model.MemberData
 
 /**
  * Description :
@@ -8,5 +8,5 @@ import com.chatteer.core.model.MemberModel
  * Created by juhongmin on 2024. 10. 3.
  */
 interface MemberRepository {
-    suspend fun fetch(): MemberModel?
+    suspend fun fetch(): MemberData?
 }

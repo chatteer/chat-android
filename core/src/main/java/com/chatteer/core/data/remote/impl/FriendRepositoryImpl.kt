@@ -2,9 +2,10 @@ package com.chatteer.core.data.remote.impl
 
 import com.chatteer.core.data.remote.apis.FriendApiService
 import com.chatteer.core.data.remote.getOrDefault
+import com.chatteer.core.data.remote.mapper.FriendMapper.toMap
 import com.chatteer.core.data.remote.models.JSendList
 import com.chatteer.core.data.remote.repository.FriendRepository
-import com.chatteer.core.model.FriendModel
+import com.chatteer.core.model.FriendData
 import javax.inject.Inject
 
 /**
@@ -15,15 +16,9 @@ import javax.inject.Inject
 internal class FriendRepositoryImpl @Inject constructor(
     private val apis: FriendApiService
 ) : FriendRepository {
-    override suspend fun fetch(): List<FriendModel> {
+    override suspend fun fetch(): List<FriendData> {
         return apis.fetch()
             .getOrDefault(JSendList())
-            .list.map {
-                FriendModel(
-                    id = it.id,
-                    name = it.name,
-                    profileImageUrl = it.profileImageUrl
-                )
-            }
+            .list.map { it.toMap() }
     }
 }

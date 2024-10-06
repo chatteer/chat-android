@@ -11,7 +11,6 @@ android {
 
 dependencies {
     implementation(projects.core)
-    implementation(projects.model)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.json)
     implementation(libs.androidx.appcompat)

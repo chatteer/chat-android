@@ -20,7 +20,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.model)
     implementation(libs.httptracking.interceptor)
     implementation(libs.androidx.core.ktx)
     implementation(libs.coroutine)
