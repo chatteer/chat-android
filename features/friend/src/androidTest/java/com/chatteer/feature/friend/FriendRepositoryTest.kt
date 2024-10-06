@@ -1,6 +1,7 @@
 package com.chatteer.feature.friend
 
 import com.chatteer.core.data.remote.repository.FriendRepository
+import com.chatteer.core.data.remote.repository.MemberRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
@@ -22,7 +23,10 @@ class FriendRepositoryTest {
     var hiltRule = HiltAndroidRule(this)
 
     @Inject
-    lateinit var repository: FriendRepository
+    lateinit var friendRepository: FriendRepository
+
+    @Inject
+    lateinit var memberRepository: MemberRepository
 
     @Before
     fun init(){
@@ -49,8 +53,10 @@ class FriendRepositoryTest {
     @Test
     fun test_fake_repository(){
         runBlocking {
-            val res = repository.fetch()
-            Timber.d("Size ${res.size}")
+            val res = friendRepository.fetch()
+            println(res)
+            val member = memberRepository.fetch()
+            println(member)
         }
     }
 }

@@ -6,7 +6,9 @@ import com.chatteer.core.data.DataExtensions
 import com.chatteer.core.data.remote.models.ApiResponse
 import com.chatteer.core.data.remote.models.JSendList
 import com.chatteer.core.data.remote.models.JSendList.Payload
+import com.chatteer.core.data.remote.models.JSendObj
 import com.chatteer.core.data.remote.models.entity.FriendEntity
+import com.chatteer.core.data.remote.models.entity.MemberEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -59,6 +61,15 @@ internal class FakeRepository(
         val registerDate: LocalDateTime = DataExtensions.nowLocalDateTime()
     )
 
+    @Serializable
+    internal data class FakeMemoEntity(
+        val id: Long = 0,
+        val title: String = "",
+        val contents: String = "",
+        @SerialName("register_date")
+        val registerDate: LocalDateTime = DataExtensions.nowLocalDateTime()
+    )
+
     private suspend fun fetchGoods(): List<FakeGoodsEntity> {
         return withContext(Dispatchers.IO) {
             val call = httpClient.newCall(
@@ -83,6 +94,18 @@ internal class FakeRepository(
         }
     }
 
+    private suspend fun fetchMemo(): List<FakeMemoEntity> {
+        return withContext(Dispatchers.IO) {
+            val call = httpClient.newCall(
+                Request.Builder()
+                    .url(baseUrl.plus("/api/v1/memo/aos"))
+                    .build()
+            )
+            val body = call.execute().body!!
+            json.decodeFromString<JSendList<FakeMemoEntity>>(body.string()).list
+        }
+    }
+
     suspend fun fetchFriend(): ApiResponse<JSendList<FriendEntity>> {
         return withContext(Dispatchers.IO) {
             val list = combine(
@@ -103,6 +126,23 @@ internal class FakeRepository(
                 return@combine list
             }.first()
             ApiResponse.Success(JSendList(depthData = Payload(list = list)))
+        }
+    }
+
+    suspend fun fetchMember(): ApiResponse<JSendObj<MemberEntity>> {
+        return withContext(Dispatchers.IO) {
+            val obj = combine(
+                flowOf(fetchMemo()),
+                flowOf(fetchFile().filter { it.mimeType.startsWith("image") })
+            ) { memoList, fileList ->
+                val memo = memoList[0]
+                return@combine MemberEntity(
+                    id = fileList.last().id,
+                    name = memo.title,
+                    profileImageUrl = fileList.last().imageUrl
+                )
+            }.first()
+            ApiResponse.Success(JSendObj(depthData = JSendObj.Payload(obj = obj)))
         }
     }
 }

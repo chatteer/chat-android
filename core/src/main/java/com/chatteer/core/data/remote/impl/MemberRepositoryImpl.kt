@@ -1,6 +1,7 @@
 package com.chatteer.core.data.remote.impl
 
 import com.chatteer.core.data.remote.apis.MemberApiService
+import com.chatteer.core.data.remote.fake.FakeRepository
 import com.chatteer.core.data.remote.getOrNull
 import com.chatteer.core.data.remote.mapper.MemberMapper.toMap
 import com.chatteer.core.data.remote.repository.MemberRepository
@@ -13,11 +14,14 @@ import javax.inject.Inject
  * Created by juhongmin on 2024. 10. 3.
  */
 internal class MemberRepositoryImpl @Inject constructor(
+    private val fakeRepository: FakeRepository,
     private val memberApi: MemberApiService
 ) : MemberRepository {
 
     override suspend fun fetch(): MemberData? {
+        return fakeRepository.fetchMember()
+            .getOrNull()?.obj?.toMap()
         // 자연 스러운 매핑 고민해봐야할듯..
-        return memberApi.fetch().getOrNull()?.obj?.toMap()
+        // return memberApi.fetch().getOrNull()?.obj?.toMap()
     }
 }
