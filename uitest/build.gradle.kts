@@ -2,9 +2,6 @@ import com.chatteer.chat.setNamespace
 
 plugins {
     id("chatteer.android.library")
-    id("chatteer.android.hilt")
-    id("chatteer.android.compose")
-    id("kotlinx-serialization")
 }
 
 android {
