@@ -1,6 +1,7 @@
 package com.chatteer.feature.friend.model.ui
 
 import androidx.compose.runtime.Composable
+import com.chatteer.core.model.FriendData
 import com.chatteer.core.ui.BaseClickEvent
 import com.chatteer.core.ui.BaseUiModel
 
@@ -12,8 +13,17 @@ import com.chatteer.core.ui.BaseUiModel
 data class FriendUiModel(
     val id: Long,
     val name: String,
-    val imageUrl : String
+    val imageUrl: String
 ) : BaseUiModel {
+
+    constructor(
+        data: FriendData
+    ) : this(
+        id = data.id,
+        name = data.name,
+        imageUrl = data.profileImageUrl
+    )
+
     override fun getType(): String {
         return "FriendUiModel"
     }

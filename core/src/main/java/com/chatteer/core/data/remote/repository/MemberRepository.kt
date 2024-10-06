@@ -8,5 +8,5 @@ import com.chatteer.core.model.MemberData
  * Created by juhongmin on 2024. 10. 3.
  */
 interface MemberRepository {
-    suspend fun fetch(): MemberData?
+    suspend fun fetch(): Result<MemberData>
 }

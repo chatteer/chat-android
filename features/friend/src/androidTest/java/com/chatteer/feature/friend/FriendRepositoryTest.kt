@@ -2,8 +2,11 @@ package com.chatteer.feature.friend
 
 import com.chatteer.core.data.remote.repository.FriendRepository
 import com.chatteer.core.data.remote.repository.MemberRepository
+import com.chatteer.feature.friend.usecase.FriendUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -27,6 +30,9 @@ class FriendRepositoryTest {
 
     @Inject
     lateinit var memberRepository: MemberRepository
+
+    @Inject
+    lateinit var useCase: FriendUseCase
 
     @Before
     fun init(){
@@ -57,6 +63,14 @@ class FriendRepositoryTest {
             println(res)
             val member = memberRepository.fetch()
             println(member)
+        }
+    }
+
+    @Test
+    fun test_fake_usecase_init(){
+        runBlocking {
+            val res = useCase().first()
+            println(res)
         }
     }
 }

@@ -56,3 +56,22 @@ inline fun <reified T> ApiResponse<T>.getOrDefault(defValue: T): T {
         defValue
     }
 }
+
+@JvmName("map_with_result")
+inline fun <reified I, reified O> ApiResponse<I>.map(
+    crossinline predicate: (I) -> O
+): Result<O> {
+    return when (this) {
+        is ApiResponse.Success -> {
+            try {
+                Result.success(predicate(data))
+            } catch (ex: Exception) {
+                Result.failure(ex)
+            }
+        }
+
+        is ApiResponse.Fail -> {
+            Result.failure(err)
+        }
+    }
+}
