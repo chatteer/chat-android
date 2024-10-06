@@ -10,6 +10,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.chatteer.core.navigation.MainTabRoute
+import com.chatteer.feature.friend.navigation.navigateFriend
 
 /**
  * Description : 메인 네비게이션
@@ -39,8 +40,7 @@ internal class MainNavigator(
         }
         when (tab) {
             MainTab.Friend -> {
-                // friend
-                navController.navigate(MainTabRoute.Friend, navOptions)
+                navController.navigateFriend(navOptions)
             }
 
             MainTab.Chat -> {

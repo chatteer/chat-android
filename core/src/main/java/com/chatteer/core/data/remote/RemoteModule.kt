@@ -1,9 +1,13 @@
 package com.chatteer.core.data.remote
 
 import android.content.Context
+import androidx.core.content.edit
 import com.chatteer.core.R
 import com.chatteer.core.data.remote.apis.FriendApiService
 import com.chatteer.core.data.remote.apis.MemberApiService
+import com.chatteer.core.data.remote.fake.FakeRepository
+import com.chatteer.core.data.remote.interceptor.HeaderInterceptor
+import com.chatteer.core.data.remote.qualifier.ApiHeaderInterceptor
 import com.chatteer.core.data.remote.qualifier.TrackingInterceptor
 import dagger.Module
 import dagger.Provides
@@ -56,6 +60,19 @@ internal object RemoteModule {
 
     @Singleton
     @Provides
+    @ApiHeaderInterceptor
+    fun provideApiHeaderInterceptor(
+        @ApplicationContext context: Context
+    ): Interceptor {
+        val pref = context.getSharedPreferences("chatter_pref", Context.MODE_PRIVATE)
+        pref.edit {
+            putString("auth_access_token", context.getString(R.string.test_token))
+        }
+        return HeaderInterceptor(pref)
+    }
+
+    @Singleton
+    @Provides
     fun provideCallAdapter(): CallAdapter.Factory {
         return CoroutineErrorHandlingCallAdapter.create()
     }
@@ -65,11 +82,13 @@ internal object RemoteModule {
     fun provideHttpClient(
         @ApplicationContext context: Context,
         @TrackingInterceptor trackingInterceptor: Interceptor,
+        @ApiHeaderInterceptor headerInterceptor: Interceptor,
         httpLogInterceptor: HttpLoggingInterceptor
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .retryOnConnectionFailure(true)
             .callTimeout(60, TimeUnit.SECONDS)
+        builder.addInterceptor(headerInterceptor)
         if (context.getString(R.string.BuildType) != "release") {
             builder.addInterceptor(trackingInterceptor)
             builder.addInterceptor(httpLogInterceptor)
@@ -106,5 +125,15 @@ internal object RemoteModule {
         retrofit: Retrofit
     ): MemberApiService {
         return retrofit.create()
+    }
+
+    @Singleton
+    @Provides
+    fun provideFakeRepository(
+        @ApplicationContext context: Context,
+        json: Json,
+        httpClient: OkHttpClient
+    ): FakeRepository {
+        return FakeRepository(context, json, httpClient)
     }
 }

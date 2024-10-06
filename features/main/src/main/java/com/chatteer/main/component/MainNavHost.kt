@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.chatteer.core.navigation.MainTabRoute
 import com.chatteer.core.ui.ChatTheme
+import com.chatteer.feature.friend.navigation.friendNavGraph
 import com.chatteer.main.MainNavigator
 import com.chatteer.main.MainTab
 import com.chatteer.main.MainViewModel
@@ -29,11 +30,7 @@ internal fun MainNavHost(
             navController = navigator.navController,
             startDestination = MainTab.Friend.route
         ) {
-            composable<MainTabRoute.Friend> {
-                Box {
-                    Text("친구")
-                }
-            }
+            friendNavGraph()
             composable<MainTabRoute.Chat> {
                 Box {
                     Text("채팅")

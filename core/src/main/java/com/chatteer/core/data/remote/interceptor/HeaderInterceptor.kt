@@ -15,9 +15,9 @@ internal class HeaderInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val reqBuilder = chain.request().newBuilder()
 
-        val token = preferences.getString("auth_access_token","")
+        val token = preferences.getString("auth_access_token", "")
         if (!token.isNullOrEmpty()) {
-            reqBuilder.header("Authorization", token)
+            reqBuilder.header("Authorization", "Bearer $token")
         }
         return chain.proceed(reqBuilder.build())
     }

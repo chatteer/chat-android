@@ -10,7 +10,7 @@ android {
 
 dependencies {
     implementation(projects.core)
-    // implementation(projects.features.friend)
+    implementation(projects.features.friend)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
     implementation(libs.kotlinx.immutable)

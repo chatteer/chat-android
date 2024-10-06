@@ -1,6 +1,7 @@
 package com.chatteer.core.data.remote.impl
 
 import com.chatteer.core.data.remote.apis.FriendApiService
+import com.chatteer.core.data.remote.fake.FakeRepository
 import com.chatteer.core.data.remote.getOrDefault
 import com.chatteer.core.data.remote.mapper.FriendMapper.toMap
 import com.chatteer.core.data.remote.models.JSendList
@@ -14,11 +15,15 @@ import javax.inject.Inject
  * Created by juhongmin on 2024. 10. 3.
  */
 internal class FriendRepositoryImpl @Inject constructor(
+    private val fakeRepository: FakeRepository,
     private val apis: FriendApiService
 ) : FriendRepository {
     override suspend fun fetch(): List<FriendData> {
-        return apis.fetch()
+        return fakeRepository.fetchFriend()
             .getOrDefault(JSendList())
             .list.map { it.toMap() }
+//        return apis.fetch()
+//            .getOrDefault(JSendList())
+//            .list.map { it.toMap() }
     }
 }

@@ -19,6 +19,7 @@ class FriendUseCase @Inject constructor(
 ) {
     operator fun invoke() : Flow<List<String>>{
         return flow {
+
             emit(listOf<String>())
         }.flowOn(Dispatchers.IO)
     }

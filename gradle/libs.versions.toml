@@ -56,11 +56,9 @@ composeMaterial3 = "1.3.0"
 
 
 ## Test
-# https://github.com/junit-team/junit4
-junit4 = "4.13.2"
 # https://mvnrepository.com/artifact/org.junit.vintage/junit-vintage-engine
 junitVintageEngine = "5.10.2"
-ui-test-junit4 = "1.7.2"
+ui-test-junit4 = "1.7.3"
 # https://developer.android.com/jetpack/androidx/releases/test-uiautomator
 uiAutomator = "2.3.0"
 androidxTestRunner = "1.6.2"
@@ -94,7 +92,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
-anddroidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -117,6 +115,7 @@ compose-navigation-test = { group = "androidx.navigation", name = "navigation-te
 hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation" }
 
 # lib

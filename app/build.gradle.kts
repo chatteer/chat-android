@@ -36,4 +36,5 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.httptracking.ui)
     implementation(libs.httptracking.interceptor)
+    testImplementation(projects.testing)
 }
