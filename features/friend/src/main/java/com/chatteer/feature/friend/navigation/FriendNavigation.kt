@@ -12,7 +12,7 @@ fun NavController.navigateFriend(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.friendNavGraph() {
-    composable<MainTabRoute.Friend>() {
+    composable<MainTabRoute.Friend> {
         FriendScreen(it)
     }
 }

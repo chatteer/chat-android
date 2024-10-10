@@ -10,12 +10,14 @@ import com.chatteer.core.ui.BaseUiModel
  */
 sealed interface FriendMainModel {
 
+    data object Loading : FriendMainModel
+
     data class Error(
         val msg: String
     ) : FriendMainModel
 
     data class Success(
         val member: MemberData,
-        val friendUiList: List<BaseUiModel>
+        val uiList: List<BaseUiModel>
     ) : FriendMainModel
 }

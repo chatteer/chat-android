@@ -6,6 +6,10 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.fragment.app.FragmentActivity
 
 /**
  * Description : 채티어 테마
@@ -39,6 +43,14 @@ private val DarkColorScheme = darkColorScheme(
 fun ChatTheme(
     content: @Composable () -> Unit,
 ) {
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        val primary = ChatTheme.color.primary.toArgb()
+        SideEffect {
+            val window = (view.context as FragmentActivity).window
+            window.statusBarColor = primary
+        }
+    }
     CompositionLocalProvider(
         LocalColor provides Color,
         LocalTypography provides Typography

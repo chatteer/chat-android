@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,6 +46,7 @@ internal fun MainBottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
+                .background(ChatTheme.color.navigation)
                 .drawTopBorder(ChatTheme.color.gray3, 1.dp)
         ) {
             tabs.forEach { tab ->

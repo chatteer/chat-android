@@ -4,8 +4,9 @@ import com.chatteer.core.data.remote.models.BaseJSend
 import com.chatteer.core.data.remote.models.JSendException
 import com.chatteer.core.data.remote.repository.FriendRepository
 import com.chatteer.core.data.remote.repository.MemberRepository
-import com.chatteer.core.ui.BaseUiModel
 import com.chatteer.feature.friend.model.ui.FriendMainModel
+import com.chatteer.feature.friend.model.ui.FriendMainModel.Error
+import com.chatteer.feature.friend.model.ui.FriendMainModel.Success
 import com.chatteer.feature.friend.model.ui.FriendUiModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -26,32 +27,31 @@ class FriendUseCase @Inject constructor(
     operator fun invoke(): Flow<FriendMainModel> {
         return combine(
             flow { emit(memberRepository.fetch()) },
-            fetchFriendList()
+            flow { emit(friendRepository.fetch()) }
         ) { memberResponse, friendList ->
             val result: FriendMainModel = try {
                 val member = memberResponse.getOrThrow()
-                FriendMainModel.Success(
+                Success(
                     member = member,
-                    friendUiList = friendList
+                    uiList = friendList.map { FriendUiModel(member, it) }
                 )
             } catch (ex: Exception) {
-                if (ex is JSendException.Network) {
-                    FriendMainModel.Error("네트워크 에러 입니다.\n잠시후 다시 이용해주세요.")
-                } else if (ex is JSendException.JSendResponse) {
-                    val msg = ex.getErrorBody<BaseJSend>()?.message
-                    FriendMainModel.Error(msg ?: "잠시후 다시 이용 해주세요.")
-                } else {
-                    FriendMainModel.Error("잠시후 다시 이용 해주세요.")
+                when (ex) {
+                    is JSendException.Network -> {
+                        Error("네트워크 에러 입니다.\n잠시후 다시 이용해주세요.")
+                    }
+
+                    is JSendException.JSendResponse -> {
+                        val msg = ex.getErrorBody<BaseJSend>()?.message
+                        Error(msg ?: "잠시후 다시 이용 해주세요.")
+                    }
+
+                    else -> {
+                        Error("잠시후 다시 이용 해주세요.")
+                    }
                 }
             }
             return@combine result
-        }.flowOn(Dispatchers.IO)
-    }
-
-    private fun fetchFriendList(): Flow<List<BaseUiModel>> {
-        return flow {
-            val res = friendRepository.fetch()
-            emit(res.map { FriendUiModel(it) })
         }.flowOn(Dispatchers.IO)
     }
 }

@@ -48,9 +48,9 @@ baselineprofile = "1.2.4"
 
 ## Compose
 # https://developer.android.com/develop/ui/compose/bom/bom-mapping
-composeBom = "2024.09.02"
+composeBom = "2024.09.03"
 # https://developer.android.com/jetpack/androidx/releases/navigation
-composeNavigation = "2.8.1"
+composeNavigation = "2.8.2"
 # https://developer.android.com/jetpack/androidx/releases/compose-material3
 composeMaterial3 = "1.3.0"
 
