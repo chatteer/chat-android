@@ -346,14 +346,12 @@ object ChatComponents {
 
     @Composable
     fun CustomText(
+        modifier: Modifier = Modifier,
         text: String,
         textStyle: TextStyle = ChatTheme.text.h3M,
         textColor: Color = ChatTheme.color.black,
         textAlignment: Alignment = Alignment.Center,
         paddingValues: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
-        modifier: Modifier = Modifier
-            .fillMaxWidth()
-            .background(ChatTheme.color.white, RoundedCornerShape(6.dp)),
         clickCallback: () -> Unit = {}
     ) {
         Box(

@@ -19,23 +19,24 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
-import com.chatteer.core.ui.ChatComponents
 import com.chatteer.core.ui.ChatComponents.BoxPadding
 import com.chatteer.core.ui.ChatComponents.HeaderAndContents
 import com.chatteer.core.ui.ChatComponents.HorizontalSpace
 import com.chatteer.core.ui.ChatComponents.ImageLoader
 import com.chatteer.core.ui.ChatComponents.LoadingDialog
 import com.chatteer.core.ui.ChatTheme
+import com.chatteer.core.ui.StatusBarChangeEvent
 import com.chatteer.feature.friend.event.ChatRoomEvent
 import com.chatteer.feature.friend.model.ui.FriendMainModel
 import timber.log.Timber
@@ -68,6 +69,11 @@ fun FriendScreen(
 
             }
         }
+    }
+
+    val statusColor = ChatTheme.color.primary.toArgb()
+    LaunchedEffect(Unit) {
+        StatusBarChangeEvent.send(statusColor)
     }
 }
 

@@ -6,14 +6,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Text
@@ -24,13 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.chatteer.core.ui.ChatComponents.drawTopBorder
 import com.chatteer.core.ui.ChatTheme
 import com.chatteer.main.MainTab
 import kotlinx.collections.immutable.PersistentList
 
 @Composable
 internal fun MainBottomBar(
+    modifier: Modifier = Modifier,
     tabs: PersistentList<MainTab>,
     visible: Boolean,
     currentTab: MainTab?,
@@ -42,13 +40,7 @@ internal fun MainBottomBar(
         enter = fadeIn() + slideIn { IntOffset(0, it.height) },
         exit = fadeOut() + slideOut { IntOffset(0, it.height) }
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .background(ChatTheme.color.navigation)
-                .drawTopBorder(ChatTheme.color.gray3, 1.dp)
-        ) {
+        Row(modifier = modifier) {
             tabs.forEach { tab ->
                 MainBottomBarItem(
                     modifier = Modifier.weight(1f),
@@ -76,7 +68,6 @@ private fun MainBottomBarItem(
 ) {
     Column(
         modifier = modifier
-            .fillMaxHeight()
             .selectable(
                 selected = selected,
                 indication = null,
@@ -91,11 +82,12 @@ private fun MainBottomBarItem(
         Image(
             painter = painterResource(iconId),
             contentDescription = item.contentDescription,
-            modifier = Modifier.size(25.dp)
+            modifier = Modifier.padding(15.dp)
         )
         Text(
             text = item.contentDescription,
-            style = ChatTheme.text.h5M
+            style = ChatTheme.text.h5M,
+            modifier = Modifier.padding(bottom = 10.dp)
         )
     }
 }
