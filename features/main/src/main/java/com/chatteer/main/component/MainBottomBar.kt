@@ -82,7 +82,7 @@ private fun MainBottomBarItem(
         Image(
             painter = painterResource(iconId),
             contentDescription = item.contentDescription,
-            modifier = Modifier.padding(15.dp)
+            modifier = Modifier.padding(vertical = 6.dp)
         )
         Text(
             text = item.contentDescription,

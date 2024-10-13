@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -42,7 +43,6 @@ internal fun MainScreen(
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     focusManager.clearFocus()
@@ -51,7 +51,6 @@ internal fun MainScreen(
         content = {
             MainNavHost(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(it),
                 navigator = navigator,
                 viewModel = viewModel
@@ -74,7 +73,7 @@ internal fun MainScreen(
         contentWindowInsets = if (statusBar.isHidden) {
             WindowInsets.navigationBars
         } else {
-            WindowInsets.systemBars
+            WindowInsets.statusBars
         }
     )
 
