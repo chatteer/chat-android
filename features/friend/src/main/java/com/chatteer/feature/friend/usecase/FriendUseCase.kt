@@ -26,8 +26,8 @@ class FriendUseCase @Inject constructor(
 ) {
     operator fun invoke(): Flow<FriendMainModel> {
         return combine(
-            flow { emit(memberRepository.fetch()) },
-            flow { emit(friendRepository.fetch()) }
+            flow { emit(memberRepository.fetch()) }.flowOn(Dispatchers.IO),
+            flow { emit(friendRepository.fetch()) }.flowOn(Dispatchers.IO)
         ) { memberResponse, friendList ->
             val result: FriendMainModel = try {
                 val member = memberResponse.getOrThrow()
